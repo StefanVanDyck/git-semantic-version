@@ -8,10 +8,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: bats/bats:latest
+      volumes:
+        - my_docker_volume:/volume_mount
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Run tests
-        run: docker run -v $(pwd):/project bats/bats:latest /project/tests
+        run: bats /project/tests
