@@ -24,4 +24,12 @@ jobs:
         run: bats tests
 
       - name: Use the action
+        id: version
         uses: ./
+      
+      - name: Debug output
+        run: |-
+          echo ${{ steps.version.outputs.number_of_changes_since_last_tag }}
+          echo ${{ steps.version.outputs.previous_version }}
+          echo ${{ steps.version.outputs.new_version }}
+          echo ${{ toJSON(steps.version.outputs) }}
