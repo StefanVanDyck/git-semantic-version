@@ -28,4 +28,4 @@ runs:
         COMPONENT: ${{ inputs.component }}
         PATHS: ${{ inputs.paths }}
       shell: bash
-      run: version.sh >> $GITHUB_OUTPUT
+      run: ./version.sh >> $GITHUB_OUTPUT
