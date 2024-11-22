@@ -40,12 +40,3 @@ runs:
     MAJOR_BUMP_MESSAGE: ${{ inputs.major_bump_message }}
     MINOR_BUMP_MESSAGE: ${{ inputs.minor_bump_message }}
     POC_RELEASE_BRANCH_PREFIX: ${{ inputs.poc_release_branch_prefix }}
-  args:
-    - ${{ inputs.who-to-greet }}
-  steps:
-    - name: Run version.sh
-      uses: "docker://bitnami/git:2"
-      id: version
-      with:
-        entrypoint: /bin/sh
-        args: -c $GITHUB_ACTION_PATH/version.sh >> $GITHUB_OUTPUT
