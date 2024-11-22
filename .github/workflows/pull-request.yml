@@ -20,8 +20,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install git
-        run: ls -la
+      - name: Debug
+        run: |-
+          ls -la
+          uid
+          whoami
 
       - name: Use the action
         uses: ./      
