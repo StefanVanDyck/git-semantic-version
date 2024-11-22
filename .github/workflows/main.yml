@@ -24,7 +24,7 @@ jobs:
         run: bats tests
 
       - name: Use the action
-        uses: ../action.yml
+        uses: ./../action.yml
 
   release:
     runs-on: ubuntu-latest
