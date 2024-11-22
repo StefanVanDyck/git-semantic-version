@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: bats/bats:latest
-      options: --user 1001
     steps:
       - name: Install git
         run: apk add --no-cache git
