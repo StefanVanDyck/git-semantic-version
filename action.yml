@@ -44,5 +44,5 @@ runs:
         MINOR_BUMP_MESSAGE: ${{ inputs.minor_bump_message }}
         POC_RELEASE_BRANCH_PREFIX: ${{ inputs.poc_release_branch_prefix }}
       with:
-        entrypoint: /bin/sh -c
-        args: $GITHUB_ACTION_PATH/version.sh >> $GITHUB_OUTPUT
+        entrypoint: /bin/sh
+        args: -c $GITHUB_ACTION_PATH/version.sh >> $GITHUB_OUTPUT
