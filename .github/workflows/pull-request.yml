@@ -8,15 +8,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: bats/bats:latest
     steps:
+      - name: Install git
+        run: apk add --no-cache git
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Run tests
-        uses: docker://bats/bats:latest
-        with:
-          args: tests
+        run: bats tests
 
       - name: Use the action
         id: version
