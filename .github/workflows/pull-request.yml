@@ -24,7 +24,15 @@ jobs:
       
       - name: Check output
         run: |-
+          if [ -z "${{ steps.version.outputs.number_of_changes_since_last_tag }}" ]; then 
+            echo "Number output is missing";
+            exit 1;
+          fi
+          if [ -z "${{ steps.version.outputs.previous_version }}" ]; then 
+            echo "Previous uutput is missing";
+            exit 1;
+          fi
           if [ -z "${{ steps.version.outputs.new_version }}" ]; then 
-            echo "Output is missing";
+            echo "New output is missing";
             exit 1;
           fi
