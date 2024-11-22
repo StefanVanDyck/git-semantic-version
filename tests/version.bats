@@ -2,7 +2,7 @@
 
 bats_require_minimum_version 1.5.0
 
-VERSION_SCRIPT="../../scripts/version.sh"
+VERSION_SCRIPT="../../version.sh"
 
 BATS_GIT_TEMP_FOLDER="tests/.version-test-temp"
 
@@ -11,11 +11,10 @@ setup() {
     mkdir "${BATS_GIT_TEMP_FOLDER}"
     cd "${BATS_GIT_TEMP_FOLDER}"
     git init
-    git config user.email "bats-test@deltaray.eu"
+    git config user.email "bats-test@svdev.be"
     git config user.name "Bats test"
     git commit -m "Initial commit" --allow-empty
 }
-
 
 
 @test "version given no tags" {
@@ -26,7 +25,9 @@ setup() {
     echo "Stderr: $stderr"
 
     [ "$status" -eq 0 ]
-    [ "$output" == "0.0.1" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=" ]
+    [ "${lines[1]}" = "previous_version=" ]
+    [ "${lines[2]}" = "new_version=0.0.1" ]
 }
 
 @test "version given a tag, but not preceded with version prefix" {
@@ -39,7 +40,9 @@ setup() {
     echo "Stderr: $stderr"
 
     [ "$status" -eq 0 ]
-    [ "$output" == "0.0.1" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=" ]
+    [ "${lines[1]}" = "previous_version=" ]
+    [ "${lines[2]}" = "new_version=0.0.1" ]
 }
 
 @test "version given a tag already set on commit, use that one" {
@@ -52,7 +55,9 @@ setup() {
     echo "Stderr: $stderr"
 
     [ "$status" -eq 0 ]
-    [ "$output" == "1.2.3" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=0" ]
+    [ "${lines[1]}" = "previous_version=1.2.3" ]
+    [ "${lines[2]}" = "new_version=1.2.3" ]
 }
 
 @test "version given a tag in previous commit, bump patch" {
@@ -66,7 +71,9 @@ setup() {
     echo "Stderr: $stderr"
 
     [ "$status" -eq 0 ]
-    [ "$output" == "1.2.4" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=1" ]
+    [ "${lines[1]}" = "previous_version=1.2.3" ]
+    [ "${lines[2]}" = "new_version=1.2.4" ]
 }
 
 @test "version given a tag in previous commit with a bump minor message, bump minor" {
@@ -80,7 +87,9 @@ setup() {
     echo "Stderr: $stderr"
 
     [ "$status" -eq 0 ]
-    [ "$output" == "1.3.0" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=1" ]
+    [ "${lines[1]}" = "previous_version=1.2.3" ]
+    [ "${lines[2]}" = "new_version=1.3.0" ]
 }
 
 
@@ -95,7 +104,9 @@ setup() {
     echo "Stderr: $stderr"
 
     [ "$status" -eq 0 ]
-    [ "$output" == "2.0.0" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=1" ]
+    [ "${lines[1]}" = "previous_version=1.2.3" ]
+    [ "${lines[2]}" = "new_version=2.0.0" ]
 }
 
 @test "version given a component and no specific tags, then default" {
@@ -108,8 +119,11 @@ setup() {
     echo "Output: $output"
     echo "Stderr: $stderr"
 
+
     [ "$status" -eq 0 ]
-    [ "$output" == "0.0.1" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=" ]
+    [ "${lines[1]}" = "previous_version=" ]
+    [ "${lines[2]}" = "new_version=0.0.1" ]
 }
 
 @test "version given a component and a specific tag, then use that one" {
@@ -123,8 +137,11 @@ setup() {
     echo "Output: $output"
     echo "Stderr: $stderr"
 
+
     [ "$status" -eq 0 ]
-    [ "$output" == "1.2.3" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=0" ]
+    [ "${lines[1]}" = "previous_version=1.2.3" ]
+    [ "${lines[2]}" = "new_version=1.2.3" ]
 }
 
 
@@ -141,11 +158,15 @@ setup() {
     echo "Stderr: $stderr"
 
     [ "$status" -eq 0 ]
-    [ "$output" == "1.2.4" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=1" ]
+    [ "${lines[1]}" = "previous_version=1.2.3" ]
+    [ "${lines[2]}" = "new_version=1.2.4" ]
 }
 
 @test "version given no component but commit already tagged with sub-component tag, then ignore and use global version" {
+    git tag -a v0.1.2 -m "some comment"
     git tag -a test-v1.2.3 -m "some comment"
+    git commit -m "no bumps" --allow-empty
 
     run --separate-stderr ${VERSION_SCRIPT}
 
@@ -153,6 +174,9 @@ setup() {
     echo "Output: $output"
     echo "Stderr: $stderr"
 
+
     [ "$status" -eq 0 ]
-    [ "$output" == "0.0.1" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=1" ]
+    [ "${lines[1]}" = "previous_version=0.1.2" ]
+    [ "${lines[2]}" = "new_version=0.1.3" ]
 }
