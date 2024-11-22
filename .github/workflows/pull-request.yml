@@ -29,7 +29,7 @@ jobs:
       
       - name: Check output
         run: |-
-          echo ${{ steps.version.outputs.number_of_changes_since_last_tag }}
-          echo ${{ steps.version.outputs.previous_version }}
-          echo ${{ steps.version.outputs.new_version }}
-          echo ${{ toJSON(steps.version.outputs) }}
+          if [ -z "${{ steps.version.outputs.new_version }}" ]; then 
+            echo "Output is missing";
+            exit 1;
+          fi
