@@ -5,7 +5,6 @@ set -e -o pipefail
 # This allows you to use it from any shell script like so VERSION=$(./.version)
 # All other info messages are piped to stderr for debugging purposes.
 
-
 ##### Default parameters #####
 # Used as a prefix for tags, usefule for mon-repo things
 COMPONENT=${COMPONENT:=""}

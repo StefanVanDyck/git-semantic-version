@@ -8,20 +8,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container:
-      image: bats/bats:latest
-      volumes:
-        - my_docker_volume:/volume_mount
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install git
-        run: apk add --no-cache git
-
       - name: Run tests
-        run: bats tests
+        run: |-
+          docker build -t test-runner tests
+          docker run --rm -v $(pwd):/project -w /project --user 1001 test-runner /project/tests
 
       - name: Use the action
         id: version
@@ -29,7 +24,15 @@ jobs:
       
       - name: Check output
         run: |-
+          if [ -z "${{ steps.version.outputs.number_of_changes_since_last_tag }}" ]; then 
+            echo "Number output is missing";
+            exit 1;
+          fi
+          if [ -z "${{ steps.version.outputs.previous_version }}" ]; then 
+            echo "Previous uutput is missing";
+            exit 1;
+          fi
           if [ -z "${{ steps.version.outputs.new_version }}" ]; then 
-            echo "Output is missing";
+            echo "New output is missing";
             exit 1;
           fi
