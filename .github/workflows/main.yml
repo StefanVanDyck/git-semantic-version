@@ -24,7 +24,7 @@ jobs:
         run: bats tests
 
       - name: Use the action
-        uses: ./../action.yml
+        uses: ./
 
   release:
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 0
 
       - name: Get next version
-        uses: ./../action.yml
+        uses: ./
         id: version
 
       - name: Create tag
