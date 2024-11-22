@@ -13,12 +13,12 @@ jobs:
       volumes:
         - my_docker_volume:/volume_mount
     steps:
+      - name: Install git
+        run: apk add --no-cache git
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Install git
-        run: apk add --no-cache git
 
       - name: Install git
         run: ls -la
