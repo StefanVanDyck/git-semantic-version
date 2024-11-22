@@ -44,7 +44,9 @@ fi
 _LAST_VERSION="$(git describe --tags --abbrev=0 --match="${_COMPONENT_VERSION_PREFIX}[0-9]*.[0-9]*.[0-9]*" || true)"
 if [ -z "${_LAST_VERSION}" ]; then
   echo >&2 "No tags found defaulting to 0.0.1"
-  echo -n "0.0.1"
+  echo "number_of_changes_since_last_tag="
+  echo "previous_version="
+  echo "new_version=0.0.1"
   exit 0
 fi
 
