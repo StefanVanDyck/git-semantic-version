@@ -19,11 +19,9 @@ jobs:
 
       - name: Install git
         run: apk add --no-cache git
-        
+
       - name: Use the action
-        id: version
-        uses: ./
-      
+        uses: ./      
 
       - name: Run tests
         run: bats tests
