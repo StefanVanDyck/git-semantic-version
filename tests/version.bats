@@ -25,7 +25,7 @@ setup() {
     echo "Stderr: $stderr"
 
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "number_of_changes_since_last_tag=" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=-1" ]
     [ "${lines[1]}" = "previous_version=" ]
     [ "${lines[2]}" = "new_version=0.0.1" ]
 }
@@ -40,7 +40,7 @@ setup() {
     echo "Stderr: $stderr"
 
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "number_of_changes_since_last_tag=" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=-1" ]
     [ "${lines[1]}" = "previous_version=" ]
     [ "${lines[2]}" = "new_version=0.0.1" ]
 }
@@ -121,7 +121,7 @@ setup() {
 
 
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "number_of_changes_since_last_tag=" ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=-1" ]
     [ "${lines[1]}" = "previous_version=" ]
     [ "${lines[2]}" = "new_version=0.0.1" ]
 }
