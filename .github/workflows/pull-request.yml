@@ -16,7 +16,7 @@ jobs:
       - name: Run tests
         run: |-
           docker build -t test-runner tests
-          docker run --rm test-runner tests
+          docker run --rm -v $(pwd):/project test-runner /project/tests
 
       - name: Use the action
         id: version
