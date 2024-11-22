@@ -14,4 +14,4 @@ jobs:
           fetch-depth: 0
 
       - name: Run tests
-        run: docker run -it -v $(pwd):/project bats/bats:latest /project/tests
+        run: docker run -v $(pwd):/project bats/bats:latest /project/tests
