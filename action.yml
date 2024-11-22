@@ -2,13 +2,25 @@ name: 'Git Version'
 description: 'Bash script to perform basic automated sematic versioning based on git tags'
 inputs:
   component:
-    description: 'name of an option sub-component, used as prefix for the git tags'
+    description: 'Name of an option sub-component, used as prefix for the git tags'
     required: false
     default: ''
   paths:
-    description: 'paths that contain changes to consider for git messages'
+    description: 'Paths that contain changes to consider for git messages'
     required: false
-    default: '.'
+    default: ''
+  major_bump_message:
+    description: 'String to look for in commit messages to trigger a major bump'
+    required: false
+    default: ''
+  minor_bump_message:
+    description: 'String to look for in commit messages to trigger a minor bump'
+    required: false
+    default: ''
+  poc_release_branch_prefix:
+    description: 'Prefix for the branch name to use for PoC releases'
+    required: false
+    default: ''
 outputs:
   number_of_changes_since_last_tag:
     description: "The number of commits since the last tag"
@@ -21,12 +33,16 @@ outputs:
     value: ${{ steps.version.outputs.new_version }}
 runs:
   using: "composite"
-  container: "alpine/git:latest"
   steps:
     - name: Run version.sh
+      uses: "docker://bitnami/git:2"
       id: version
       env:
         COMPONENT: ${{ inputs.component }}
         PATHS: ${{ inputs.paths }}
-      shell: bash
-      run: $GITHUB_ACTION_PATH/version.sh >> $GITHUB_OUTPUT
+        MAJOR_BUMP_MESSAGE: ${{ inputs.major_bump_message }}
+        MINOR_BUMP_MESSAGE: ${{ inputs.minor_bump_message }}
+        POC_RELEASE_BRANCH_PREFIX: ${{ inputs.poc_release_branch_prefix }}
+      with:
+        entrypoint: /bin/sh
+        args: -c $GITHUB_ACTION_PATH/version.sh >> $GITHUB_OUTPUT

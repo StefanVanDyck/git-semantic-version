@@ -22,3 +22,6 @@ jobs:
 
       - name: Run tests
         run: bats tests
+
+      - name: Use the action
+        uses: ./
