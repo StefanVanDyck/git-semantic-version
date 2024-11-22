@@ -21,6 +21,9 @@ jobs:
       - name: Run tests
         run: bats tests
 
+      - name: Fix permissions to fix "detected dubious ownership" error
+        run: chown -R 1001:1001 .
+
       - name: Use the action
         id: version
         uses: ./
