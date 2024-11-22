@@ -27,7 +27,7 @@ jobs:
         id: version
         uses: ./
       
-      - name: Debug output
+      - name: Check output
         run: |-
           echo ${{ steps.version.outputs.number_of_changes_since_last_tag }}
           echo ${{ steps.version.outputs.previous_version }}
