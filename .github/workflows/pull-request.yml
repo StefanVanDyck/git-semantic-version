@@ -8,29 +8,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container:
-      image: bats/bats:latest
-      volumes:
-        - my_docker_volume:/volume_mount
     steps:
-      - name: Install git
-        run: apk add --no-cache git
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Debug
-        run: |-
-          ls -la
-          id
-          whoami
-
-      - name: Use the action
-        uses: ./      
-
       - name: Run tests
-        run: bats tests
+        uses: docker://bats/bats:latest
+        with:
+          args: tests
 
       - name: Use the action
         id: version
