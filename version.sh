@@ -9,7 +9,6 @@ echo  >&2 $(pwd)
 ls -la  >&2
 
 id  >&2
-whoami  >&2
 
 ##### Default parameters #####
 # Used as a prefix for tags, usefule for mon-repo things
