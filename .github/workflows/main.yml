@@ -1,0 +1,44 @@
+name: Release new version of the action
+run-name: ${{ github.actor }} is releasing a new version
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  test:
+    uses: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run tests
+        run: docker run -v $(pwd):/project bats/bats:latest /project/tests
+
+  release:
+    uses: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get next version
+        uses: ./action.yml
+        id: version
+        with:
+          component: 'my-action'
+          paths: '.'
+
+      - name: Create tag
+        if: ${{ steps.version.outputs.number_of_changes_since_last_tag != '0' }}
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v${{ steps.version.outputs.next_version }}',
+              sha: context.sha
+            })
