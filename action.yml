@@ -21,9 +21,9 @@ outputs:
     value: ${{ steps.version.outputs.new_version }}
 runs:
   using: "composite"
-  container: "alpine/git:latest"
   steps:
     - name: Run version.sh
+      using: "docker://alpine/git:2""
       id: version
       env:
         COMPONENT: ${{ inputs.component }}
