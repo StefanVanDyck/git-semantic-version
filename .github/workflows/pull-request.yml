@@ -20,6 +20,9 @@ jobs:
       - name: Install git
         run: apk add --no-cache git
 
+      - name: Install git
+        run: ls -la
+
       - name: Use the action
         uses: ./      
 
