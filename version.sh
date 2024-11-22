@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -e -o pipefail
 # This script determines what the current version should be based on previous git tags and new commit messages.
 # The execution should result in outputting the to be released version to stdout.
