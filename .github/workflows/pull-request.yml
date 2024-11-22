@@ -18,4 +18,4 @@ jobs:
           fetch-depth: 0
 
       - name: Run tests
-        run: bats /project/tests
+        run: bats tests
