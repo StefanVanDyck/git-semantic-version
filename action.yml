@@ -23,7 +23,7 @@ runs:
   using: "composite"
   steps:
     - name: Run version.sh
-      using: "docker://alpine/git:2"
+      uses: "docker://alpine/git:2"
       id: version
       env:
         COMPONENT: ${{ inputs.component }}
