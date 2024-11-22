@@ -42,4 +42,5 @@ runs:
         MAJOR_BUMP_MESSAGE: ${{ inputs.major_bump_message }}
         MINOR_BUMP_MESSAGE: ${{ inputs.minor_bump_message }}
         POC_RELEASE_BRANCH_PREFIX: ${{ inputs.poc_release_branch_prefix }}
+      shell: bash
       run: $GITHUB_ACTION_PATH/version.sh >> $GITHUB_OUTPUT
