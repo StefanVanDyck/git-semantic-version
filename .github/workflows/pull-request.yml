@@ -24,4 +24,12 @@ jobs:
         run: bats tests
 
       - name: Use the action
+        id: version
         uses: ./
+      
+      - name: Check output
+        run: |-
+          if [ -z "${{ steps.version.outputs.new_version }}" ]; then 
+            echo "Output is missing";
+            exit 1;
+          fi
