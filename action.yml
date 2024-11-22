@@ -32,17 +32,11 @@ outputs:
     description: "The new version number"
     value: ${{ steps.version.outputs.new_version }}
 runs:
-  using: "composite"
-  steps:
-    - name: Run version.sh
-      uses: "docker://bitnami/git:2"
-      id: version
-      env:
-        COMPONENT: ${{ inputs.component }}
-        PATHS: ${{ inputs.paths }}
-        MAJOR_BUMP_MESSAGE: ${{ inputs.major_bump_message }}
-        MINOR_BUMP_MESSAGE: ${{ inputs.minor_bump_message }}
-        POC_RELEASE_BRANCH_PREFIX: ${{ inputs.poc_release_branch_prefix }}
-      with:
-        entrypoint: /bin/sh
-        args: -c $GITHUB_ACTION_PATH/version.sh >> $GITHUB_OUTPUT
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+    COMPONENT: ${{ inputs.component }}
+    PATHS: ${{ inputs.paths }}
+    MAJOR_BUMP_MESSAGE: ${{ inputs.major_bump_message }}
+    MINOR_BUMP_MESSAGE: ${{ inputs.minor_bump_message }}
+    POC_RELEASE_BRANCH_PREFIX: ${{ inputs.poc_release_branch_prefix }}
