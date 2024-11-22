@@ -13,13 +13,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: build test-runner
-        run: docker build -t test-runner tests
-
       - name: Run tests
-        uses: docker://test-runner
-        with:
-          args: tests
+        run: |-
+          docker build -t test-runner tests
+          docker run --rm test-runner tests
 
       - name: Use the action
         id: version
