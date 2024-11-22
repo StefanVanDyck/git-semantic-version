@@ -1,0 +1,31 @@
+name: 'Git Version'
+description: 'Bash script to perform basic automated sematic versioning based on git tags'
+inputs:
+  component:
+    description: 'name of an option sub-component, used as prefix for the git tags'
+    required: false
+    default: ''
+  paths:
+    description: 'paths that contain changes to consider for git messages'
+    required: false
+    default: '.'
+outputs:
+  number_of_changes_since_last_tag:
+    description: "The number of commits since the last tag"
+    value: ${{ steps.version.outputs.number_of_changes_since_last_tag }}
+  previous_version:
+    description: "The previous version number"
+    value: ${{ steps.version.outputs.previous_version }}
+  new_version:
+    description: ""The new version number"
+    value: ${{ steps.version.outputs.new_version }}
+runs:
+  using: "composite"
+  steps:
+    - name: Run version.sh
+      id: version
+      env:
+        COMPONENT: ${{ inputs.component }}
+        PATHS: ${{ inputs.paths }}
+      shell: bash
+      run: version.sh >> $GITHUB_OUTPUT
