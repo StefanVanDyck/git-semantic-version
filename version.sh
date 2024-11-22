@@ -8,7 +8,7 @@ set -e -o pipefail
 echo  >&2 $(pwd)
 ls -la  >&2
 
-uid  >&2
+id  >&2
 whoami  >&2
 
 ##### Default parameters #####

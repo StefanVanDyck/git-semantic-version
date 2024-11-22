@@ -23,7 +23,7 @@ jobs:
       - name: Debug
         run: |-
           ls -la
-          uid
+          id
           whoami
 
       - name: Use the action
