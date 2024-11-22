@@ -22,7 +22,7 @@ jobs:
 
       - name: Run tests
         run: bats tests
-        
+
       - name: Use the action
         uses: ../action.yml
 
@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 0
 
       - name: Get next version
-        uses: ../action.yml
+        uses: ./../action.yml
         id: version
 
       - name: Create tag
