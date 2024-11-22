@@ -28,5 +28,9 @@ runs:
       env:
         COMPONENT: ${{ inputs.component }}
         PATHS: ${{ inputs.paths }}
-      shell: bash
-      run: $GITHUB_ACTION_PATH/version.sh >> $GITHUB_OUTPUT
+      with:
+        entrypoint: 
+          - "/bin/sh"
+          - "-c"
+        args: 
+          - $GITHUB_ACTION_PATH/version.sh >> $GITHUB_OUTPUT
