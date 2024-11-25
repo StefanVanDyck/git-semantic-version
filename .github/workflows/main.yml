@@ -38,6 +38,8 @@ jobs:
       - name: Get next version
         uses: ./
         id: version
+        with:
+          paths: ". ':!tests'"
 
       - name: Create tag
         if: ${{ steps.version.outputs.number_of_changes_since_last_tag != '0' }}
