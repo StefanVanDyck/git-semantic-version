@@ -39,7 +39,7 @@ jobs:
         uses: ./
         id: version
         with:
-          paths: ". ':!tests'"
+          paths: ". ':!tests/**'"
 
       - name: Debug
         run: |
