@@ -186,15 +186,15 @@ setup() {
 
     touch in-path
     git add in-path
-    git commit -m "bump"
+    git commit -m "[bump_version+minor]"
 
     touch not-in-path-1
     git add not-in-path-1
-    git commit -m "no bump"
+    git commit -m "nothing"
 
     touch not-in-path-2
     git add not-in-path-2
-    git commit -m "no bump"
+    git commit -m "[bump_version+major]"
 
     export PATHS="in-path"
     run --separate-stderr ${VERSION_SCRIPT}
@@ -207,7 +207,7 @@ setup() {
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "number_of_changes_since_last_tag=1" ] # This is the important bit
     [ "${lines[1]}" = "previous_version=0.1.2" ]
-    [ "${lines[2]}" = "new_version=0.1.3" ]
+    [ "${lines[2]}" = "new_version=0.2.0" ]
 }
 
 @test "version given a specific path, ignore changes in other paths" {
@@ -215,11 +215,11 @@ setup() {
 
     touch not-in-path-1
     git add not-in-path-1
-    git commit -m "no bump"
+    git commit -m "[bump_version+minor] no bump"
 
     touch not-in-path-2
     git add not-in-path-2
-    git commit -m "no bump"
+    git commit -m "[bump_version+major] no bump"
 
     export PATHS="in-path"
     run --separate-stderr ${VERSION_SCRIPT}
