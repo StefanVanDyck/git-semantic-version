@@ -13,6 +13,7 @@ PATHS=${PATHS:=""}
 # The string to check for inside of any commit messages.
 MAJOR_BUMP_MESSAGE=${MAJOR_BUMP_MESSAGE:="\[bump_version+major\]"}
 MINOR_BUMP_MESSAGE=${MINOR_BUMP_MESSAGE:="\[bump_version+minor\]"}
+IGNORE_MESSAGE=${IGNORE_MESSAGE:="\[bump_version+ignore\]"}
 POC_RELEASE_BRANCH_PREFIX=${POC_RELEASE_BRANCH_PREFIX:="poc-release/"}
 
 # Check if the current branch starts with the PoC release prefix and if so, return the reset of the branch name as a version
@@ -61,24 +62,63 @@ if [ -n "${PATHS}" ]; then
 fi
 
 # Look for strings in commit messages since last tag
-if [ -n "$(git log "${_LAST_VERSION_TAG}..HEAD" --oneline --grep="${MAJOR_BUMP_MESSAGE}" ${_PATHS_ARGUMENT})" ]; then
-  echo >&2 "Found ${MAJOR_BUMP_MESSAGE} in commit messages, bumping major version."
-  echo >&2 $(git log "${_LAST_VERSION_TAG}..HEAD" --oneline --grep="${MAJOR_BUMP_MESSAGE} ${_PATHS_ARGUMENT}")
-  _CURRENT_VERSION[0]=$((_CURRENT_VERSION[0] + 1))
-  _CURRENT_VERSION[1]=0
-  _CURRENT_VERSION[2]=0
-elif [ -n "$(git log "${_LAST_VERSION_TAG}..HEAD" --oneline --grep="${MINOR_BUMP_MESSAGE}" ${_PATHS_ARGUMENT})" ]; then
-  echo >&2 "Found ${MINOR_BUMP_MESSAGE} in commit messages, bumping minor version."
-  echo >&2 $(git log "${_LAST_VERSION_TAG}..HEAD" --oneline --grep="${MINOR_BUMP_MESSAGE} ${_PATHS_ARGUMENT}")
-  _CURRENT_VERSION[1]=$((_CURRENT_VERSION[1] + 1))
-  _CURRENT_VERSION[2]=0
+# Fetch commits in one go; restrict to PATHS if provided
+_RAW_COMMITS="$(git log "${_LAST_VERSION_TAG}..HEAD" --oneline ${_PATHS_ARGUMENT} || true)"
+
+# Normalize configured markers by removing backslashes so we can use fixed-string matching
+# This allows the defaults like \[bump_version+major\] to match literal commit messages like [bump_version+major]
+_MAJOR_MARKER="${MAJOR_BUMP_MESSAGE//\\}"
+_MINOR_MARKER="${MINOR_BUMP_MESSAGE//\\}"
+_IGNORE_MARKER="${IGNORE_MESSAGE//\\}"
+
+# Filter out commits that contain the ignore marker so they are excluded from versioning
+if [ -z "${_RAW_COMMITS}" ]; then
+  _COMMITS=""
 else
-  echo >&2 "Found no bump in commit messages, bumping patch version."
-  _CURRENT_VERSION[2]=$((_CURRENT_VERSION[2] + 1))
+  _COMMITS="$(printf '%s\n' "${_RAW_COMMITS}" | grep -vFi -- "${_IGNORE_MARKER}" || true)"
+fi
+
+# If there are no non-ignored commits we need to distinguish two situations:
+# 1) There were no commits at all in the (optional) PATHS -> treat like "no bump marker found" and bump patch
+# 2) There were commits but all of them contained the ignore marker -> ignore those changes and return the previous version
+if [ -z "${_COMMITS}" ]; then
+  if [ -n "${_RAW_COMMITS}" ]; then
+    echo >&2 "All commits since last tag were ignored by ignore marker, returning previous version."
+    echo "number_of_changes_since_last_tag=0"
+    echo "previous_version=${_LAST_VERSION}"
+    echo "new_version=${_LAST_VERSION}"
+    exit 0
+  else
+    echo >&2 "No commits in relevant paths since last tag, bumping patch version."
+    _CURRENT_VERSION[2]=$((_CURRENT_VERSION[2] + 1))
+  fi
+else
+  # Helper: return commits that match the given pattern (case-insensitive, fixed string)
+  _matches() {
+    local pattern="$1"
+    printf '%s\n' "${_COMMITS}" | grep -iF -- "${pattern}" || true
+  }
+
+  if [ -n "$( _matches "${_MAJOR_MARKER}" )" ]; then
+    echo >&2 "Found ${_MAJOR_MARKER} in commit messages, bumping major version."
+    echo >&2 "$( _matches "${_MAJOR_MARKER}" )"
+    _CURRENT_VERSION[0]=$((_CURRENT_VERSION[0] + 1))
+    _CURRENT_VERSION[1]=0
+    _CURRENT_VERSION[2]=0
+  elif [ -n "$( _matches "${_MINOR_MARKER}" )" ]; then
+    echo >&2 "Found ${_MINOR_MARKER} in commit messages, bumping minor version."
+    echo >&2 "$( _matches "${_MINOR_MARKER}" )"
+    _CURRENT_VERSION[1]=$((_CURRENT_VERSION[1] + 1))
+    _CURRENT_VERSION[2]=0
+  else
+    echo >&2 "Found no bump in commit messages, bumping patch version."
+    _CURRENT_VERSION[2]=$((_CURRENT_VERSION[2] + 1))
+  fi
 fi
 echo >&2 "Current version = ${_CURRENT_VERSION[0]}.${_CURRENT_VERSION[1]}.${_CURRENT_VERSION[2]}"
 
-# Return result to stdout
-echo "number_of_changes_since_last_tag=$(git log --oneline ${_LAST_VERSION_TAG}..HEAD ${_PATHS_ARGUMENT} | wc -l)"
+# Count non-ignored commits and return result to stdout
+_NUMBER_OF_CHANGES=$(printf '%s\n' "${_COMMITS}" | sed '/^$/d' | wc -l)
+echo "number_of_changes_since_last_tag=${_NUMBER_OF_CHANGES}"
 echo "previous_version=${_LAST_VERSION}"
 echo "new_version=${_CURRENT_VERSION[0]}.${_CURRENT_VERSION[1]}.${_CURRENT_VERSION[2]}"
