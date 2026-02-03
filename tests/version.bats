@@ -109,6 +109,66 @@ setup() {
     [ "${lines[2]}" = "new_version=2.0.0" ]
 }
 
+
+@test "ignore bump when IGNORE_MESSAGE present (default marker)" {
+    git tag -a v1.2.3 -m "some comment"
+    # Commit contains both minor bump and the default ignore marker -> should be ignored
+    git commit -m "[bump_version+minor] [bump_version+ignore]" --allow-empty
+
+    run --separate-stderr ${VERSION_SCRIPT}
+
+    echo "Status: $status"
+    echo "Output: $output"
+    echo "Stderr: $stderr"
+
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=0" ]
+    [ "${lines[1]}" = "previous_version=1.2.3" ]
+    # Because the commit contains the ignore marker, the commit is ignored entirely and no bump is applied
+    [ "${lines[2]}" = "new_version=1.2.3" ]
+}
+
+
+@test "ignore bump when IGNORE_MESSAGE is customized" {
+    git tag -a v1.2.3 -m "some comment"
+    # Configure a custom ignore marker
+    export IGNORE_MESSAGE="[skip-bump]"
+    # Commit contains a major bump marker but also the custom ignore marker -> should be ignored
+    git commit -m "[bump_version+major] [skip-bump]" --allow-empty
+
+    run --separate-stderr ${VERSION_SCRIPT}
+
+    echo "Status: $status"
+    echo "Output: $output"
+    echo "Stderr: $stderr"
+
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=0" ]
+    [ "${lines[1]}" = "previous_version=1.2.3" ]
+    # Because the commit contains the custom ignore marker, the commit is ignored entirely and no bump is applied
+    [ "${lines[2]}" = "new_version=1.2.3" ]
+}
+
+
+@test "patch bump when multiple commits and one ignored" {
+    git tag -a v1.2.3 -m "some comment"
+    # First commit is ignored
+    git commit -m "[bump_version+ignore]" --allow-empty
+    # Second commit is a normal change -> should trigger a patch bump
+    git commit -m "normal change" --allow-empty
+
+    run --separate-stderr ${VERSION_SCRIPT}
+
+    echo "Status: $status"
+    echo "Output: $output"
+    echo "Stderr: $stderr"
+
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "number_of_changes_since_last_tag=1" ]
+    [ "${lines[1]}" = "previous_version=1.2.3" ]
+    [ "${lines[2]}" = "new_version=1.2.4" ]
+}
+
 @test "version given a component and no specific tags, then default" {
     git tag -a v1.2.3 -m "some comment"
     export COMPONENT=test

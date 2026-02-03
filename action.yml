@@ -1,26 +1,30 @@
-name: 'Git Version'
-description: 'Bash script to perform basic automated sematic versioning based on git tags'
+name: "Git Version"
+description: "Bash script to perform basic automated sematic versioning based on git tags"
 inputs:
   component:
-    description: 'Name of an option sub-component, used as prefix for the git tags'
+    description: "Name of an option sub-component, used as prefix for the git tags"
     required: false
-    default: ''
+    default: ""
   paths:
-    description: 'Paths that contain changes to consider for git messages'
+    description: "Paths that contain changes to consider for git messages"
     required: false
-    default: ''
+    default: ""
   major_bump_message:
-    description: 'String to look for in commit messages to trigger a major bump'
+    description: "String to look for in commit messages to trigger a major bump"
     required: false
-    default: ''
+    default: ""
   minor_bump_message:
-    description: 'String to look for in commit messages to trigger a minor bump'
+    description: "String to look for in commit messages to trigger a minor bump"
     required: false
-    default: ''
+    default: ""
+  ignore_message:
+    description: "String to look for in commit messages to ignore the commit for versioning"
+    required: false
+    default: ""
   poc_release_branch_prefix:
-    description: 'Prefix for the branch name to use for PoC releases'
+    description: "Prefix for the branch name to use for PoC releases"
     required: false
-    default: ''
+    default: ""
 outputs:
   number_of_changes_since_last_tag:
     description: "The number of commits since the last tag"
@@ -41,6 +45,7 @@ runs:
         PATHS: ${{ inputs.paths }}
         MAJOR_BUMP_MESSAGE: ${{ inputs.major_bump_message }}
         MINOR_BUMP_MESSAGE: ${{ inputs.minor_bump_message }}
+        IGNORE_MESSAGE: ${{ inputs.ignore_message }}
         POC_RELEASE_BRANCH_PREFIX: ${{ inputs.poc_release_branch_prefix }}
       shell: bash
       run: $GITHUB_ACTION_PATH/version.sh >> $GITHUB_OUTPUT
